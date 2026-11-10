@@ -1,0 +1,43 @@
+CREATE DATABASE IF NOT EXISTS proyecto_ruben CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE proyecto_ruben;
+
+CREATE TABLE IF NOT EXISTS proveedor (
+  id_proveedor INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  razon_social VARCHAR(150) NOT NULL,
+  rfc VARCHAR(13) NOT NULL,
+  direccion VARCHAR(255) NOT NULL,
+  telefono VARCHAR(25) NOT NULL,
+  estado TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS producto (
+  id_producto INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(150) NOT NULL,
+  precio DECIMAL(10,2) NOT NULL,
+  existencias INT UNSIGNED NOT NULL,
+  estado TINYINT(1) NOT NULL DEFAULT 1,
+  id_proveedor INT UNSIGNED NOT NULL,
+  u_medida VARCHAR(30) NOT NULL,
+  FOREIGN KEY (id_proveedor) REFERENCES proveedor(id_proveedor)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS cliente (
+  id_cliente INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(150) NOT NULL,
+  direccion VARCHAR(255) NOT NULL,
+  rfc VARCHAR(13) NOT NULL,
+  estado TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS venta (
+  id_venta INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  fecha_venta DATETIME NOT NULL,
+  id_cliente INT UNSIGNED NOT NULL,
+  FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS det_venta (
+  id_detalle INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  id_producto INT UNSIGNED NOT NULL,
+  id_venta INT UNSIGNED NOT NULL,
+  cantidad INT UNSIGNED NOT NULL,
+  precio_h DECIMAL(10,2) NOT NULL,
+  FOREIGN KEY (id_producto) REFERENCES producto(id_producto),
+  FOREIGN KEY (id_venta) REFERENCES venta(id_venta)
+) ENGINE=InnoDB;
