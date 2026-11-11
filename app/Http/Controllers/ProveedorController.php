@@ -11,8 +11,9 @@ class ProveedorController extends Controller
     public function index(Request $request)
     {
         $estado = $request->query('estado') === 'inactivos' ? 'inactivos' : 'activos';
+        $totales = DB::table('proveedor')->select('estado', DB::raw('COUNT(*) as total'))->groupBy('estado')->pluck('total', 'estado');
         $proveedores = DB::table('proveedor')->where('estado', $estado === 'activos' ? 1 : 0)->orderBy('razon_social')->get();
-        return view('proveedores', compact('proveedores', 'estado'));
+        return view('proveedores', compact('proveedores', 'estado', 'totales'));
     }
 
     public function create()

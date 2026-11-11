@@ -11,10 +11,11 @@ class ProductoController extends Controller
     public function index(Request $request)
     {
         $estado = $request->query('estado') === 'inactivos' ? 'inactivos' : 'activos';
+        $totales = DB::table('producto')->select('estado', DB::raw('COUNT(*) as total'))->groupBy('estado')->pluck('total', 'estado');
         $productos = DB::table('producto')->join('proveedor', 'producto.id_proveedor', '=', 'proveedor.id_proveedor')
             ->where('producto.estado', $estado === 'activos' ? 1 : 0)
             ->orderBy('producto.id_producto')->select('producto.*', 'proveedor.razon_social as proveedor')->get();
-        return view('productos', compact('productos', 'estado'));
+        return view('productos', compact('productos', 'estado', 'totales'));
     }
 
     public function create()

@@ -50,7 +50,7 @@ class InventarioTest extends TestCase
             $this->delete('/'.$ruta.'/'.$id)->assertRedirect('/'.$ruta);
             $this->assertDatabaseHas($tipo, ['id_'.$tipo => $id, $nombre => 'Editado', 'estado' => 0]);
             $this->get('/'.$ruta)->assertDontSee('Editado');
-            $this->get('/'.$ruta.'?estado=inactivos')->assertSee('Editado');
+            $this->get('/'.$ruta.'?estado=inactivos')->assertSee('Editado')->assertSee('Activos (0)')->assertSee('Inactivos (1)');
             $this->put('/'.$ruta.'/'.$id, $datos)->assertRedirect('/'.$ruta);
             $this->assertDatabaseHas($tipo, ['id_'.$tipo => $id, 'estado' => 1]);
         }
@@ -60,6 +60,6 @@ class InventarioTest extends TestCase
         $this->delete('/productos/'.$id)->assertRedirect('/');
         $this->assertDatabaseHas('producto', ['id_producto' => $id, 'estado' => 0]);
         $this->get('/')->assertDontSee('Producto</td>', false);
-        $this->get('/?estado=inactivos')->assertSee('Producto</td>', false);
+        $this->get('/?estado=inactivos')->assertSee('Producto</td>', false)->assertSee('Activos (0)')->assertSee('Inactivos (1)');
     }
 }

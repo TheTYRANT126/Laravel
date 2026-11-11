@@ -1,6 +1,6 @@
 @extends('layout')
+@section('titulo', $proveedor ? 'Editar proveedor' : 'Crear proveedor')
 @section('contenido')
-<h1>{{ $proveedor ? 'Editar proveedor' : 'Crear proveedor' }}</h1>
 <form class="formulario" method="post" action="{{ $proveedor ? route('proveedores.update', $proveedor->id_proveedor) : route('proveedores.store') }}">@csrf @if($proveedor) @method('PUT') @endif
 <label for="razon_social">Razón social</label><input id="razon_social" name="razon_social" maxlength="150" required value="{{ old('razon_social', $proveedor->razon_social ?? '') }}">
 <label for="rfc">RFC</label><input id="rfc" name="rfc" maxlength="13" required value="{{ old('rfc', $proveedor->rfc ?? '') }}">

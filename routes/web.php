@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\VentaController;
 use App\Http\Controllers\ProveedorController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,3 +25,10 @@ Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.st
 Route::get('/clientes/{id}/editar', [ClienteController::class, 'edit'])->name('clientes.edit');
 Route::put('/clientes/{id}', [ClienteController::class, 'update'])->name('clientes.update');
 Route::delete('/clientes/{id}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
+
+Route::get('/ventas', [VentaController::class, 'index'])->name('ventas.index');
+Route::post('/ventas/cliente', [VentaController::class, 'cliente'])->name('ventas.cliente');
+Route::post('/ventas/carrito', [VentaController::class, 'agregar'])->name('ventas.agregar');
+Route::delete('/ventas/carrito/{id}', [VentaController::class, 'quitar'])->name('ventas.quitar');
+Route::post('/ventas/nueva', [VentaController::class, 'nueva'])->name('ventas.nueva');
+Route::post('/ventas/comprar', [VentaController::class, 'comprar'])->name('ventas.comprar');

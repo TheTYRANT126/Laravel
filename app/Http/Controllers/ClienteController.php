@@ -11,8 +11,9 @@ class ClienteController extends Controller
     public function index(Request $request)
     {
         $estado = $request->query('estado') === 'inactivos' ? 'inactivos' : 'activos';
+        $totales = DB::table('cliente')->select('estado', DB::raw('COUNT(*) as total'))->groupBy('estado')->pluck('total', 'estado');
         $clientes = DB::table('cliente')->where('estado', $estado === 'activos' ? 1 : 0)->orderBy('nombre')->get();
-        return view('clientes', compact('clientes', 'estado'));
+        return view('clientes', compact('clientes', 'estado', 'totales'));
     }
 
     public function create()

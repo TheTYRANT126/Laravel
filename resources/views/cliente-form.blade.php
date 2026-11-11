@@ -1,6 +1,6 @@
 @extends('layout')
+@section('titulo', $cliente ? 'Editar cliente' : 'Crear cliente')
 @section('contenido')
-<h1>{{ $cliente ? 'Editar cliente' : 'Crear cliente' }}</h1>
 <form class="formulario" method="post" action="{{ $cliente ? route('clientes.update', $cliente->id_cliente) : route('clientes.store') }}">@csrf @if($cliente) @method('PUT') @endif
 <label for="nombre">Nombre</label><input id="nombre" name="nombre" maxlength="150" required value="{{ old('nombre', $cliente->nombre ?? '') }}">
 <label for="direccion">Dirección</label><input id="direccion" name="direccion" maxlength="255" required value="{{ old('direccion', $cliente->direccion ?? '') }}">

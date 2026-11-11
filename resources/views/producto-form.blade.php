@@ -1,6 +1,6 @@
 @extends('layout')
+@section('titulo', $producto ? 'Editar producto' : 'Crear producto')
 @section('contenido')
-<h1>{{ $producto ? 'Editar producto' : 'Crear producto' }}</h1>
 @if($proveedores->isEmpty()) <p class="notice">Primero <a href="{{ route('proveedores.create') }}">crea un proveedor</a>.</p> @endif
 <form class="formulario" method="post" action="{{ $producto ? route('productos.update', $producto->id_producto) : route('productos.store') }}">@csrf @if($producto) @method('PUT') @endif
 <label for="nombre">Nombre</label><input id="nombre" name="nombre" maxlength="150" required value="{{ old('nombre', $producto->nombre ?? '') }}">
