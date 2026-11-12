@@ -30,6 +30,9 @@ CREATE TABLE IF NOT EXISTS venta (
   id_venta INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   fecha_venta DATETIME NOT NULL,
   total DECIMAL(20,2) NOT NULL DEFAULT 0,
+  metodo_pago VARCHAR(20) NULL,
+  monto_recibido DECIMAL(20,2) NULL,
+  cambio DECIMAL(20,2) NULL,
   id_cliente INT UNSIGNED NOT NULL,
   FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
 ) ENGINE=InnoDB;

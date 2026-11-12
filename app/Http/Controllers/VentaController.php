@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 
 class VentaController extends Controller
 {
@@ -58,12 +59,16 @@ class VentaController extends Controller
 
     public function comprar(Request $request)
     {
+        $datos = $request->validate([
+            'metodo_pago' => ['required', Rule::in(['efectivo', 'tarjeta', 'transferencia'])],
+            'monto_recibido' => ['required_if:metodo_pago,efectivo', 'nullable', 'regex:/^\d{1,12}(\.\d{1,2})?$/'],
+        ]);
         $carrito = $request->session()->get('carrito', []);
         $cliente = $request->session()->get('cliente_venta');
         if (! $cliente || ! $carrito) {
             throw ValidationException::withMessages(['venta' => 'Selecciona un cliente y agrega productos al carrito.']);
         }
-        DB::transaction(function () use ($cliente, $carrito) {
+        $idVenta = DB::transaction(function () use ($cliente, $carrito, $datos) {
             if (! DB::table('cliente')->where('id_cliente', $cliente)->where('estado', 1)->lockForUpdate()->exists()) {
                 throw ValidationException::withMessages(['venta' => 'El cliente seleccionado ya no está disponible.']);
             }
@@ -81,9 +86,32 @@ class VentaController extends Controller
                 DB::table('producto')->where('id_producto', $id)->decrement('existencias', $cantidad);
             }
             $total = DB::table('det_venta')->where('id_venta', $idVenta)->selectRaw('SUM(cantidad * precio_h) as total')->value('total');
-            DB::table('venta')->where('id_venta', $idVenta)->update(['total' => $total]);
+            $recibido = $datos['metodo_pago'] === 'efectivo' ? $datos['monto_recibido'] : null;
+            $cambio = null;
+            if ($recibido !== null) {
+                $pago = DB::selectOne('SELECT CAST(? AS DECIMAL(20,2)) >= CAST(? AS DECIMAL(20,2)) AS suficiente, CAST(? AS DECIMAL(20,2)) - CAST(? AS DECIMAL(20,2)) AS cambio', [$recibido, $total, $recibido, $total]);
+                if (! $pago->suficiente) {
+                    throw ValidationException::withMessages(['monto_recibido' => 'El efectivo recibido no cubre el total de la venta.']);
+                }
+                $cambio = $pago->cambio;
+            }
+            DB::table('venta')->where('id_venta', $idVenta)->update([
+                'total' => $total, 'metodo_pago' => $datos['metodo_pago'],
+                'monto_recibido' => $recibido, 'cambio' => $cambio,
+            ]);
+            return $idVenta;
         });
         $request->session()->forget(['carrito', 'cliente_venta']);
-        return redirect()->route('ventas.index')->with('mensaje', 'Compra registrada correctamente.');
+        return redirect()->route('ventas.ticket', $idVenta);
     }
+    public function ticket(int $id)
+    {
+        $venta = DB::table('venta')->join('cliente', 'venta.id_cliente', '=', 'cliente.id_cliente')
+            ->where('venta.id_venta', $id)->select('venta.*', 'cliente.nombre as cliente')->first();
+        abort_unless($venta, 404);
+        $detalles = DB::table('det_venta')->join('producto', 'det_venta.id_producto', '=', 'producto.id_producto')
+            ->where('det_venta.id_venta', $id)->select('det_venta.*', 'producto.nombre')->get();
+        return view('ticket', compact('venta', 'detalles'));
+    }
+
 }

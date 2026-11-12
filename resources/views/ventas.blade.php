@@ -2,7 +2,7 @@
 @section('titulo', 'Ventas')
 @section('contenido')
 <style>
-.venta-toolbar{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;padding-bottom:20px;border-bottom:1px solid #e5e7eb}.cliente-select{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.cliente-select label{margin:0 0 6px}.cliente-select select{min-width:220px}.venta-grid{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:24px;margin-top:24px}.store-title{font-size:20px;margin:0 0 4px}.store-subtitle{color:#687383;margin:0 0 18px;font-size:14px}.product-list{display:grid;gap:12px}.store-product{border:1px solid #e1e5eb;border-radius:6px;padding:18px;display:flex;align-items:center;gap:18px}.product-info{flex:1;min-width:0}.product-info h3{margin:0 0 8px;font-size:17px}.product-info p{margin:4px 0;color:#536173;font-size:14px}.product-price{font-size:20px;font-weight:bold;color:#202b38}.add-product{display:flex;align-items:center;gap:8px}.add-product input{width:70px}.cart{background:#f8fafc;border:1px solid #e1e5eb;border-radius:6px;padding:18px;align-self:start}.cart h2,.history h2{font-size:19px;margin:0 0 15px}.cart-item{padding:12px 0;border-bottom:1px solid #dee2e6}.cart-item strong{display:block;overflow-wrap:anywhere}.cart-item p{margin:6px 0;color:#536173}.remove{background:none;color:#b42332;padding:0;text-decoration:underline;font-size:14px}.cart-total{display:flex;justify-content:space-between;font-size:18px;font-weight:bold;margin:18px 0}.cart .primary{width:100%}.history{margin-top:36px}.history td{vertical-align:top}.history ul{padding-left:18px;margin:0}.muted{color:#657181;font-size:14px}.primary:disabled{opacity:.5;cursor:not-allowed}@media(max-width:800px){.venta-grid{grid-template-columns:1fr}.store-product{flex-wrap:wrap}.add-product{width:100%;justify-content:flex-end}}@media(max-width:500px){.cliente-select,.cliente-select select{width:100%}}
+.venta-toolbar{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;padding-bottom:20px;border-bottom:1px solid #e5e7eb}.cliente-select{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.cliente-select label{margin:0 0 6px}.cliente-select select{min-width:220px}.venta-grid{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:24px;margin-top:24px}.store-title{font-size:20px;margin:0 0 4px}.product-list{display:grid;gap:12px;margin-top:16px}.store-product{border:1px solid #e1e5eb;border-radius:6px;padding:18px;display:flex;align-items:center;gap:18px}.product-info{flex:1;min-width:0}.product-info h3{margin:0 0 8px;font-size:17px}.product-info p{margin:4px 0;color:#536173;font-size:14px}.product-price{font-size:20px;font-weight:bold;color:#202b38}.add-product{display:flex;align-items:center;gap:8px}.add-product input{width:70px}.cart{background:#f8fafc;border:1px solid #e1e5eb;border-radius:6px;padding:18px;align-self:start}.cart h2,.history h2{font-size:19px;margin:0 0 15px}.cart-item{padding:12px 0;border-bottom:1px solid #dee2e6}.cart-item strong{display:block;overflow-wrap:anywhere}.cart-item p{margin:6px 0;color:#536173}.remove{background:none;color:#b42332;padding:0;text-decoration:underline;font-size:14px}.cart-total{display:flex;justify-content:space-between;font-size:18px;font-weight:bold;margin:18px 0}.cart .primary{width:100%;margin-top:16px}.history{margin-top:36px}.history td{vertical-align:top}.history ul{padding-left:18px;margin:0}.muted{color:#657181;font-size:14px}.primary:disabled{opacity:.5;cursor:not-allowed}@media(max-width:800px){.venta-grid{grid-template-columns:1fr}.store-product{flex-wrap:wrap}.add-product{width:100%;justify-content:flex-end}}@media(max-width:500px){.cliente-select,.cliente-select select{width:100%}}
 </style>
 <div class="venta-toolbar">
 <form class="cliente-select" method="post" action="{{ route('ventas.cliente') }}">@csrf
@@ -11,10 +11,12 @@
 <form method="post" action="{{ route('ventas.nueva') }}" onsubmit="return confirm('¿Iniciar una nueva venta y vaciar el carrito?')">@csrf<button type="submit">＋ Nueva venta</button></form>
 </div>
 <div class="venta-grid">
-<section aria-labelledby="catalogo"><h2 class="store-title" id="catalogo">Productos disponibles</h2><p class="store-subtitle">Explora el catálogo y agrega productos a tu carrito.</p>
+<section aria-labelledby="catalogo"><h2 class="store-title" id="catalogo">Productos disponibles</h2>
+<label for="buscar-producto">Buscar producto</label><input type="search" id="buscar-producto" placeholder="Escribe el nombre del producto..." autocomplete="off">
+<p id="sin-productos" class="muted" hidden>No se encontraron productos.</p>
 <div class="product-list">
 @forelse($productos as $producto)
-<article class="store-product"><div class="product-info"><h3>{{ $producto->nombre }}</h3><p>{{ $producto->existencias }} disponibles · {{ $producto->u_medida }}</p><span class="product-price">${{ number_format((float) $producto->precio, 2) }}</span></div>
+<article class="store-product" data-nombre="{{ $producto->nombre }}"><div class="product-info"><h3>{{ $producto->nombre }}</h3><p>{{ $producto->existencias }} disponibles · {{ $producto->u_medida }}</p><span class="product-price">${{ number_format((float) $producto->precio, 2) }}</span></div>
 <form class="add-product" action="{{ route('ventas.agregar') }}" method="post">@csrf<input type="hidden" name="id_producto" value="{{ $producto->id_producto }}"><label class="visually-hidden" for="cantidad-{{ $producto->id_producto }}">Cantidad de {{ $producto->nombre }}</label><input id="cantidad-{{ $producto->id_producto }}" name="cantidad" type="number" min="1" max="{{ $producto->existencias }}" value="1" required><button class="primary">Agregar</button></form></article>
 @empty <p class="muted">No hay productos disponibles en este momento.</p> @endforelse
 </div></section>
@@ -26,12 +28,46 @@
 <div class="cart-item"><strong>{{ $articulo->nombre }}</strong><p>{{ $carrito[$articulo->id_producto] }} × ${{ number_format((float) $articulo->precio, 2) }} = ${{ number_format($subtotal, 2) }}</p><form method="post" action="{{ route('ventas.quitar', $articulo->id_producto) }}">@csrf @method('DELETE')<button class="remove">Quitar</button></form></div>
 @empty <p class="muted">Tu carrito está vacío.</p> @endforelse
 <div class="cart-total"><span>Total</span><span>${{ number_format($total, 2) }}</span></div>
-<form method="post" action="{{ route('ventas.comprar') }}">@csrf<button class="primary" @disabled(!$articulos->count() || !session('cliente_venta'))>Comprar</button></form>
-@if(!session('cliente_venta'))<p class="muted">Selecciona un cliente para registrar la compra.</p>@endif
+<form method="post" action="{{ route('ventas.comprar') }}" id="form-pago">@csrf
+<label for="metodo_pago">Método de pago</label><select name="metodo_pago" id="metodo_pago" required><option value="efectivo" @selected(old('metodo_pago', 'efectivo') === 'efectivo')>Efectivo</option><option value="tarjeta" @selected(old('metodo_pago') === 'tarjeta')>Tarjeta</option><option value="transferencia" @selected(old('metodo_pago') === 'transferencia')>Transferencia</option></select>
+<div id="pago-efectivo"><label for="monto_recibido">Efectivo recibido</label><input id="monto_recibido" name="monto_recibido" type="number" min="0" max="999999999999.99" step="0.01" value="{{ old('monto_recibido') }}" required><p id="cambio-preview" class="muted" aria-live="polite"></p></div>
+<button class="primary" @disabled(!$articulos->count() || !session('cliente_venta'))>Comprar</button></form>
 </aside></div>
-<section class="history" aria-labelledby="historial"><h2 id="historial">Historial de ventas</h2><div class="table-wrap"><table><thead><tr><th>ID</th><th>Cliente</th><th>Productos y cantidad</th><th>Total</th></tr></thead><tbody>
+<section class="history" aria-labelledby="historial"><h2 id="historial">Historial de ventas</h2><div class="table-wrap"><table><thead><tr><th>ID</th><th>Cliente</th><th>Productos y cantidad</th><th>Total</th><th>Ticket</th></tr></thead><tbody>
 @forelse($ventas as $venta)
-<tr><td>{{ $venta->id_venta }}</td><td>{{ $venta->cliente }}</td><td><ul>@foreach($detalles->get($venta->id_venta, collect()) as $detalle) <li>{{ $detalle->nombre }} × {{ $detalle->cantidad }} (${{ number_format((float) $detalle->precio_h, 2) }} c/u)</li>@endforeach</ul></td><td>${{ number_format((float) $venta->total, 2) }}</td></tr>
-@empty <tr><td colspan="4">Aún no hay ventas registradas.</td></tr> @endforelse
+<tr><td>{{ $venta->id_venta }}</td><td>{{ $venta->cliente }}</td><td><ul>@foreach($detalles->get($venta->id_venta, collect()) as $detalle) <li>{{ $detalle->nombre }} × {{ $detalle->cantidad }} (${{ number_format((float) $detalle->precio_h, 2) }} c/u)</li>@endforeach</ul></td><td>${{ number_format((float) $venta->total, 2) }}</td><td><a href="{{ route('ventas.ticket', $venta->id_venta) }}">Ticket / PDF</a></td></tr>
+@empty <tr><td colspan="5">Aún no hay ventas registradas.</td></tr> @endforelse
 </tbody></table></div></section>
+<script>
+const busquedaProductos = document.getElementById('buscar-producto');
+const productosVenta = [...document.querySelectorAll('.store-product')];
+busquedaProductos.addEventListener('input', () => {
+    const texto = busquedaProductos.value.trim().toLocaleLowerCase('es');
+    let visibles = 0;
+    productosVenta.forEach(producto => {
+        producto.hidden = !producto.dataset.nombre.toLocaleLowerCase('es').includes(texto);
+        if (!producto.hidden) visibles++;
+    });
+    document.getElementById('sin-productos').hidden = !texto || visibles > 0 || !productosVenta.length;
+});
+const metodoPago = document.getElementById('metodo_pago');
+const montoRecibido = document.getElementById('monto_recibido');
+const cambioPreview = document.getElementById('cambio-preview');
+const totalVenta = @json($total);
+function actualizarPago() {
+    const efectivo = metodoPago.value === 'efectivo';
+    document.getElementById('pago-efectivo').hidden = !efectivo;
+    montoRecibido.required = efectivo;
+    montoRecibido.disabled = !efectivo;
+    if (montoRecibido.value === '') {
+        cambioPreview.textContent = '';
+        return;
+    }
+    const diferencia = Math.round(Number(montoRecibido.value) * 100) - Math.round(totalVenta * 100);
+    cambioPreview.textContent = diferencia < 0 ? 'El efectivo no cubre el total.' : 'Cambio: $' + (diferencia / 100).toFixed(2);
+}
+metodoPago.addEventListener('change', actualizarPago);
+montoRecibido.addEventListener('input', actualizarPago);
+actualizarPago();
+</script>
 @endsection

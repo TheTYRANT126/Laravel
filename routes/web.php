@@ -32,3 +32,5 @@ Route::post('/ventas/carrito', [VentaController::class, 'agregar'])->name('venta
 Route::delete('/ventas/carrito/{id}', [VentaController::class, 'quitar'])->name('ventas.quitar');
 Route::post('/ventas/nueva', [VentaController::class, 'nueva'])->name('ventas.nueva');
 Route::post('/ventas/comprar', [VentaController::class, 'comprar'])->name('ventas.comprar');
+
+Route::get('/ventas/{id}/ticket', [VentaController::class, 'ticket'])->name('ventas.ticket');
