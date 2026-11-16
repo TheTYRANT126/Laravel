@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\Proveedor;
 use Illuminate\Validation\Rule;
 
 class ProveedorController extends Controller
@@ -11,8 +11,8 @@ class ProveedorController extends Controller
     public function index(Request $request)
     {
         $estado = $request->query('estado') === 'inactivos' ? 'inactivos' : 'activos';
-        $totales = DB::table('proveedor')->select('estado', DB::raw('COUNT(*) as total'))->groupBy('estado')->pluck('total', 'estado');
-        $proveedores = DB::table('proveedor')->where('estado', $estado === 'activos' ? 1 : 0)->orderBy('razon_social')->get();
+        $totales = Proveedor::totalesPorEstado();
+        $proveedores = Proveedor::listarPorEstado($estado === 'activos' ? 1 : 0);
         return view('proveedores', compact('proveedores', 'estado', 'totales'));
     }
 
@@ -23,8 +23,7 @@ class ProveedorController extends Controller
 
     public function edit(int $id)
     {
-        $proveedor = DB::table('proveedor')->where('id_proveedor', $id)->first();
-        abort_unless($proveedor, 404);
+        $proveedor = Proveedor::findOrFail($id);
         return view('proveedor-form', compact('proveedor'));
     }
 
@@ -41,21 +40,19 @@ class ProveedorController extends Controller
 
     public function store(Request $request)
     {
-        DB::table('proveedor')->insert($this->datos($request));
+        Proveedor::create($this->datos($request));
         return redirect()->route('proveedores.index')->with('mensaje', 'Proveedor creado.');
     }
 
     public function update(Request $request, int $id)
     {
-        abort_unless(DB::table('proveedor')->where('id_proveedor', $id)->exists(), 404);
-        DB::table('proveedor')->where('id_proveedor', $id)->update($this->datos($request));
+        Proveedor::findOrFail($id)->update($this->datos($request));
         return redirect()->route('proveedores.index')->with('mensaje', 'Proveedor actualizado.');
     }
 
     public function destroy(int $id)
     {
-        abort_unless(DB::table('proveedor')->where('id_proveedor', $id)->exists(), 404);
-        DB::table('proveedor')->where('id_proveedor', $id)->update(['estado' => 0]);
+        Proveedor::findOrFail($id)->update(['estado' => 0]);
         return redirect()->route('proveedores.index')->with('mensaje', 'Proveedor desactivado.');
     }
 }

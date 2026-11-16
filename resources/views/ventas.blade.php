@@ -35,7 +35,7 @@
 </aside></div>
 <section class="history" aria-labelledby="historial"><h2 id="historial">Historial de ventas</h2><div class="table-wrap"><table><thead><tr><th>ID</th><th>Cliente</th><th>Productos y cantidad</th><th>Total</th><th>Ticket</th></tr></thead><tbody>
 @forelse($ventas as $venta)
-<tr><td>{{ $venta->id_venta }}</td><td>{{ $venta->cliente }}</td><td><ul>@foreach($detalles->get($venta->id_venta, collect()) as $detalle) <li>{{ $detalle->nombre }} × {{ $detalle->cantidad }} (${{ number_format((float) $detalle->precio_h, 2) }} c/u)</li>@endforeach</ul></td><td>${{ number_format((float) $venta->total, 2) }}</td><td><a href="{{ route('ventas.ticket', $venta->id_venta) }}">Ticket / PDF</a></td></tr>
+<tr><td>{{ $venta->id_venta }}</td><td>{{ $venta->cliente->nombre }}</td><td><ul>@foreach($venta->detalles as $detalle) <li>{{ $detalle->producto->nombre }} × {{ $detalle->cantidad }} (${{ number_format((float) $detalle->precio_h, 2) }} c/u)</li>@endforeach</ul></td><td>${{ number_format((float) $venta->total, 2) }}</td><td><a href="{{ route('ventas.ticket', $venta->id_venta) }}">Ticket / PDF</a></td></tr>
 @empty <tr><td colspan="5">Aún no hay ventas registradas.</td></tr> @endforelse
 </tbody></table></div></section>
 <script>

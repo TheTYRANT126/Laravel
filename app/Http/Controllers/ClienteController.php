@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\Cliente;
 use Illuminate\Validation\Rule;
 
 class ClienteController extends Controller
@@ -11,8 +11,8 @@ class ClienteController extends Controller
     public function index(Request $request)
     {
         $estado = $request->query('estado') === 'inactivos' ? 'inactivos' : 'activos';
-        $totales = DB::table('cliente')->select('estado', DB::raw('COUNT(*) as total'))->groupBy('estado')->pluck('total', 'estado');
-        $clientes = DB::table('cliente')->where('estado', $estado === 'activos' ? 1 : 0)->orderBy('nombre')->get();
+        $totales = Cliente::totalesPorEstado();
+        $clientes = Cliente::listarPorEstado($estado === 'activos' ? 1 : 0);
         return view('clientes', compact('clientes', 'estado', 'totales'));
     }
 
@@ -23,8 +23,7 @@ class ClienteController extends Controller
 
     public function edit(int $id)
     {
-        $cliente = DB::table('cliente')->where('id_cliente', $id)->first();
-        abort_unless($cliente, 404);
+        $cliente = Cliente::findOrFail($id);
         return view('cliente-form', compact('cliente'));
     }
 
@@ -40,21 +39,19 @@ class ClienteController extends Controller
 
     public function store(Request $request)
     {
-        DB::table('cliente')->insert($this->datos($request));
+        Cliente::create($this->datos($request));
         return redirect()->route('clientes.index')->with('mensaje', 'Cliente creado.');
     }
 
     public function update(Request $request, int $id)
     {
-        abort_unless(DB::table('cliente')->where('id_cliente', $id)->exists(), 404);
-        DB::table('cliente')->where('id_cliente', $id)->update($this->datos($request));
+        Cliente::findOrFail($id)->update($this->datos($request));
         return redirect()->route('clientes.index')->with('mensaje', 'Cliente actualizado.');
     }
 
     public function destroy(int $id)
     {
-        abort_unless(DB::table('cliente')->where('id_cliente', $id)->exists(), 404);
-        DB::table('cliente')->where('id_cliente', $id)->update(['estado' => 0]);
+        Cliente::findOrFail($id)->update(['estado' => 0]);
         return redirect()->route('clientes.index')->with('mensaje', 'Cliente desactivado.');
     }
 }
