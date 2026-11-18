@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -12,6 +13,7 @@ class VentaTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->actingAs((new User)->forceFill(['id' => 1, 'name' => 'Admin', 'role' => 'admin', 'activo' => true]));
         Schema::create('cliente', function (Blueprint $table) {
             $table->id('id_cliente');
             $table->string('nombre');

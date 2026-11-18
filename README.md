@@ -57,3 +57,17 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+## Acceso al sistema
+
+Después de configurar la base de datos, ejecuta:
+
+```bash
+php artisan migrate
+php artisan db:seed --class=UsuariosDemoSeeder
+```
+
+Esto crea las cuentas de demostración `admin` y `empleado` con las contraseñas indicadas para el proyecto. Si ya existe un usuario con alguno de esos nombres, no se modifica ni se restablece su contraseña. El administrador puede crear, editar, activar y desactivar empleados en **Usuarios**. El empleado puede consultar productos y registrar ventas.
+
+Estas cuentas tienen contraseñas conocidas y son solo para demostración en un entorno local. Para un sistema accesible por red, cambia las contraseñas y utiliza HTTPS.

@@ -20,8 +20,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
+        'activo',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -34,6 +37,11 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public static function listado()
+    {
+        return static::orderBy('name')->get();
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -43,6 +51,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'activo' => 'boolean',
             'password' => 'hashed',
         ];
     }
